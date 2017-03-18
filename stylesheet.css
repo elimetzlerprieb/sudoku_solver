@@ -1,0 +1,22 @@
+html, body {
+	height: 100%
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background-color: #ffffff;
+}
+
+#puzzle {
+	text-align: center;
+	margin-right: auto;
+	margin-left: auto;
+
+}
+
+h1, form, p {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+
