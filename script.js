@@ -10,6 +10,28 @@ var testPuzzle = [[4,0,8,0,0,0,0,6,7],
 				  [0,0,0,0,1,9,0,0,0],
 				  [0,0,0,8,0,0,0,9,0],
 				  [5,6,0,0,0,0,1,0,3]];
+/*var testPuzzle = [[0,0,0,0,0,0,0,0,0],
+				  [0,0,0,0,0,0,0,0,0],
+				  [0,0,0,0,0,0,0,0,0],
+				  [0,0,0,0,0,0,0,0,0],
+				  [0,0,0,0,0,0,0,0,0],
+				  [0,0,0,0,0,0,0,0,0],
+				  [0,0,0,0,0,0,0,0,0],
+				  [0,0,0,0,0,0,0,0,0],
+				  [0,0,0,0,0,0,0,0,0]];
+
+
+var testPuzzle = [[1,1,1,1,1,1,1,1,1],
+				  [1,1,1,1,1,1,1,1,1],
+				  [1,1,1,1,1,1,1,1,1],
+				  [1,1,1,1,1,1,1,1,1],
+				  [1,1,1,1,1,1,1,1,1],
+				  [1,1,1,1,1,1,1,1,1],
+				  [1,1,1,1,1,1,1,1,1],
+				  [1,1,1,1,1,1,1,1,1],
+				  [1,1,1,1,1,1,1,1,1]];
+				  */
+
 
 console.log(testPuzzle);
 
@@ -52,45 +74,58 @@ function showPuzzle(puzzle) {
 
 function clickToSolve(puzzle) {
 	$("#solve").click(function() {
-		var solvedPuzzle = solvePuzzle(puzzle);
-		console.log(solvedPuzzle);
+		solvePuzzle(puzzle);
 	})
 };
 
 // Recursively solve the sudoku puzzle using a backtracking method
-function solvePuzzle(puzzle) {
+function solvePuzzle(puzzle,x=0,y=0) {
+	console.log(puzzle)
+	// Check to see if the puzzle has been filled in
 	var coord = findEmpty(puzzle);
 
-	if(coord == false){
-		console.log("Sudoku Solved!")
-		console.log(puzzle)
-		return
+	// Non-base case: puzzle is not solved (not filled)
+	if(coord != false){
+
+		x = coord[0];
+		y = coord[1];
+
+		console.log(x)
+		console.log(y)
+
+		
+		for(var i = 1; i < 10; i++){
+
+			if((checkRow(puzzle,x,y,i)==true) && (checkColumn(puzzle,x,y,i)==true) && (check3x3(puzzle,x,y,i)==true)) {
+				puzzle[x][y] = i;
+				
+				if(solvePuzzle(puzzle,x,y)) {return true}
+
+				puzzle[x][y] = 0;				
+			}
+		}
+		
+		return false 
+	} 
+	// Base case: puzzle is solved (filled with correct values)
+	else if(coord == false){
+		console.log("Solved!")
+		console.log(puzzle.join("\n"))
+		return true
 	}
+
+
 	
-	x = coord[0];
-	y = coord[1];
-
-	console.log(x)
-	console.log(y)
-
-	copyPuzzle = puzzle;
-
-	for(var i = 1; i < 10; i++){
-		if(i==10){return false}
-
-		copyPuzzle[x][y] = i;
-		if((checkRow(copyPuzzle,x,y,i)==false) || (checkColumn(copyPuzzle,x,y,i)==false) || (check3x3(copyPuzzle,x,y,i)==false)) {
-			continue
-		} else if((checkRow(copyPuzzle,x,y,i)==true) && (checkColumn(copyPuzzle,x,y,i)==true) && (check3x3(copyPuzzle,x,y,i)==true)) {
-			solvePuzzle(copyPuzzle);
-			continue
-		} 
-	}
 
 
-	console.log(puzzle)
+
+
+
+
+	
 };
  
+// Looks for an empty cell. Returns false if array is full 
 function findEmpty(puzzle){
 	for(var x = 0; x < (puzzle.length); x++) {
 		for(var y = 0; y < (puzzle.length); y++) {
@@ -102,20 +137,7 @@ function findEmpty(puzzle){
 	return false
 };
 
-/*
-function assignValue(puzzle,x,y){
-	for(var i = 1; i < 10; i++){
-		puzzle[x][y] = i;
-		if((checkRow(puzzle,x,y,i)==false) || (checkColumn(puzzle,x,y,i)==false) || (check3x3(puzzle,x,y,i)==false)) {
-			continue;
-		} else if((checkRow(puzzle,x,y,i)==true) && (checkColumn(puzzle,x,y,i)==true) && (check3x3(puzzle,x,y,i)==true)) {
-			solvePuzzle(puzzle);
-			continue;
-		} else {return false}
-	}
-};
-*/
-
+// Checks to make sure integer is not already in row
 function checkRow(puzzle,x,y,i){
 	for(var j = 0; j < 9; j++){
 		if(j==y){
@@ -128,6 +150,7 @@ function checkRow(puzzle,x,y,i){
 
 };
 
+// Checks to make sure integer is not already in column
 function checkColumn(puzzle,x,y,i){
 	for(var k = 0; k < 9; k++){
 		if(k==x){
@@ -139,7 +162,8 @@ function checkColumn(puzzle,x,y,i){
 	return true
 };
 
-function check3x3(puzzle,x,y,i){
+// Checks to make sure integer is not in appropriate 3x3 space (grids labeled left to right, top to bottom)
+function check3x3(puzzle,x,y,i){ //Grid 1
 	if ((x<3) && (y<3)){
 		xx = 3;
 		yy = 3;
