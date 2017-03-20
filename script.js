@@ -1,7 +1,84 @@
-var templatePuzzle = buildPuzzle();
+//puzzle = buildPuzzle()
 
 // From dailysudoku.com/sudoku/play.shtml on March 17, 2017
-var testPuzzle = [[4,0,8,0,0,0,0,6,7],
+/*puzzle = [[4,0,8,0,0,0,0,6,7],
+		  [0,2,0,0,0,8,0,0,0],
+		  [0,0,0,7,5,0,0,0,0],
+		  [8,0,5,0,7,4,0,2,0],
+		  [2,0,0,0,0,0,0,0,5],
+		  [0,4,0,5,6,0,3,0,8],
+		  [0,0,0,0,1,9,0,0,0],
+		  [0,0,0,8,0,0,0,9,0],
+		  [5,6,0,0,0,0,1,0,3]];
+
+console.log(unsolvedPuzzle.join("\n"));
+*/
+$(document).ready(function(){
+	showGrid('puzzle')
+	showGrid('solution')
+
+	clickToGetPuzzle()
+	clickToSolve()
+	clickToReset()
+})
+
+
+
+/*
+function copyPuzzle(puzzle) {
+	var newPuzzle = puzzle.map(function(arr) {
+		return arr.slice();
+	});
+	return newPuzzle
+}
+*/
+
+
+// Creates HTML array
+function showGrid(name) {
+	// Append rows to table
+	for(var x = 0; x < 9; x++) {
+		jQuery("<tr/>", {
+			id: 'r'+x+name,
+		}).appendTo("[id="+name+"]");
+
+		// Append td to each row
+		for(var y = 0; y < 9; y++) {
+			jQuery("<td/>", {
+			class: "box",
+			id: 'c' + y + name,
+			}).appendTo("tr[id=r"+x+name+"]");
+		}
+	}
+};
+
+// Updates HTML grid with new values
+function updateGrid(name,puzzle) {
+	for(var x = 0; x < (puzzle.length); x++) {
+		for(var y = 0; y < (puzzle.length); y++) {
+			$("tr[id=r"+x+name+"] > td[id=c"+y+name+"]").text(puzzle[x][y])
+		}
+	}
+}; 
+
+// Reads HTML grid and generates an array
+function readGrid(name) {
+	var puzzle = [];
+	for(var x = 0; x < 9; x++) {
+		puzzle[x] = [];
+		for(var y = 0; y < 9; y++) {
+			puzzle[x][y] = $("tr[id=r"+x+name+"] > td[id=c"+y+name+"]").text();
+		}
+	}
+	console.log(puzzle)
+	return puzzle
+};
+
+
+// Loads puzzle 
+function clickToGetPuzzle() {
+	$(document).on("click","#random",function(){
+		testPuzzle = [[4,0,8,0,0,0,0,6,7],
 				  [0,2,0,0,0,8,0,0,0],
 				  [0,0,0,7,5,0,0,0,0],
 				  [8,0,5,0,7,4,0,2,0],
@@ -10,121 +87,55 @@ var testPuzzle = [[4,0,8,0,0,0,0,6,7],
 				  [0,0,0,0,1,9,0,0,0],
 				  [0,0,0,8,0,0,0,9,0],
 				  [5,6,0,0,0,0,1,0,3]];
-/*var testPuzzle = [[0,0,0,0,0,0,0,0,0],
-				  [0,0,0,0,0,0,0,0,0],
-				  [0,0,0,0,0,0,0,0,0],
-				  [0,0,0,0,0,0,0,0,0],
-				  [0,0,0,0,0,0,0,0,0],
-				  [0,0,0,0,0,0,0,0,0],
-				  [0,0,0,0,0,0,0,0,0],
-				  [0,0,0,0,0,0,0,0,0],
-				  [0,0,0,0,0,0,0,0,0]];
-
-
-var testPuzzle = [[1,1,1,1,1,1,1,1,1],
-				  [1,1,1,1,1,1,1,1,1],
-				  [1,1,1,1,1,1,1,1,1],
-				  [1,1,1,1,1,1,1,1,1],
-				  [1,1,1,1,1,1,1,1,1],
-				  [1,1,1,1,1,1,1,1,1],
-				  [1,1,1,1,1,1,1,1,1],
-				  [1,1,1,1,1,1,1,1,1],
-				  [1,1,1,1,1,1,1,1,1]];
-				  */
-
-
-console.log(testPuzzle);
-
-$(document).ready(function(){
-
-	showPuzzle(templatePuzzle);
-	clickToSolve(testPuzzle);
-})
-
-// Creates an array(rows) of arrays (column values) representing a sudoku puzzle
-function buildPuzzle() {
-	var puzzle = [];
-	var i = 1;
-	for(var y=0; y<9; y++) {
-		puzzle[y] = [];
-		for(var x=0; x<9; x++) {
-			puzzle[y][x] = 0;
-		}
-	}
-	return puzzle;
+		updateGrid('puzzle',testPuzzle)
+		updateGrid('solution',testPuzzle)
+		console.log(testPuzzle.join("\n"))
+	})
 };
 
-// Creates HTML array with row id mapped to row and td id mapped to column
-function showPuzzle(puzzle) {
-	// Append rows to table(id=puzzle)
-	for(var x = 0; x < (puzzle.length); x++) {
-		jQuery("<tr/>", {
-			id: x,
-		}).appendTo("#puzzle");
-	}
-
-	// Append td to each row
-	for(var y = 0; y < (puzzle.length); y++) {
-		jQuery("<td/>", {
-		class: "box",
-		id: y,	
-		}).appendTo("tr");
-	}
+// On click: parses current HTML puzzle into an array and solves array before updating solution grid 
+function clickToSolve() {
+	$(document).on("click","#solve",function(){
+		puzzle = readGrid('puzzle')
+		var solvedPuzzle = solvePuzzle(puzzle)
+		updateGrid('solution',solvedPuzzle)
+	})
 };
 
-function clickToSolve(puzzle) {
-	$("#solve").click(function() {
-		solvePuzzle(puzzle);
+// On click: parses current HTML puzzle into an array and makes solution grid identical 
+function clickToReset() {
+	$(document).on("click","#reset",function(){
+		puzzle = readGrid('puzzle')
+		updateGrid('solution',puzzle);
 	})
 };
 
 // Recursively solve the sudoku puzzle using a backtracking method
 function solvePuzzle(puzzle,x=0,y=0) {
-	console.log(puzzle)
 	// Check to see if the puzzle has been filled in
 	var coord = findEmpty(puzzle);
 
 	// Non-base case: puzzle is not solved (not filled)
 	if(coord != false){
-
 		x = coord[0];
 		y = coord[1];
-
-		console.log(x)
-		console.log(y)
-
-		
 		for(var i = 1; i < 10; i++){
-
 			if((checkRow(puzzle,x,y,i)==true) && (checkColumn(puzzle,x,y,i)==true) && (check3x3(puzzle,x,y,i)==true)) {
 				puzzle[x][y] = i;
-				
-				if(solvePuzzle(puzzle,x,y)) {return true}
-
+				if(solvePuzzle(puzzle)) {return puzzle}
 				puzzle[x][y] = 0;				
 			}
 		}
-		
 		return false 
 	} 
 	// Base case: puzzle is solved (filled with correct values)
 	else if(coord == false){
 		console.log("Solved!")
-		console.log(puzzle.join("\n"))
-		return true
+		return puzzle
 	}
-
-
-	
-
-
-
-
-
-
-	
 };
  
+
 // Looks for an empty cell. Returns false if array is full 
 function findEmpty(puzzle){
 	for(var x = 0; x < (puzzle.length); x++) {
@@ -140,24 +151,15 @@ function findEmpty(puzzle){
 // Checks to make sure integer is not already in row
 function checkRow(puzzle,x,y,i){
 	for(var j = 0; j < 9; j++){
-		if(j==y){
-			continue
-		} else if(puzzle[x][j] == i){
-			return false;
-		}
+		if(puzzle[x][j] == i){return false}
 	}
-	return true;
-
+	return true
 };
 
 // Checks to make sure integer is not already in column
 function checkColumn(puzzle,x,y,i){
 	for(var k = 0; k < 9; k++){
-		if(k==x){
-			continue
-		} else if(puzzle[k][y] == i){
-			return false
-		}
+		if(puzzle[k][y] == i){return false}
 	}
 	return true
 };
@@ -195,11 +197,7 @@ function check3x3(puzzle,x,y,i){ //Grid 1
 
 	for (var j = (xx-3); j < xx; j++) {
 		for (var k = (yy-3); k < yy; k++) {
-			if((x==j)&&(y==k)) {
-				continue
-			} else if(puzzle[j][k] == i) {
-				return false
-			}
+			if(puzzle[j][k] == i) {return false}
 		}
 	}
 	return true 

@@ -7,6 +7,30 @@ html, body {
 	background-color: #ffffff;
 }
 
+#random {
+
+}
+
+#solve {
+
+}
+
+#animate {
+
+}
+
+#reset {
+
+}
+
+.s {
+
+}
+
+.p {
+	
+}
+
 #puzzle {
 	margin-right: auto;
 	margin-left: auto;
@@ -15,11 +39,17 @@ html, body {
 	margin-bottom: 20px;
 }
 
-#solve {
-
+#solution {
+	margin-right: auto;
+	margin-left: auto;
+	border-collapse: collapse;
+	border-spacing: 0;
+	margin-bottom: 20px;
 }
 
 .box {
+	border-radius: 5px;
+	text-align: center;
 	height: 20px;
 	width: 20px;
 	margin: 0;
