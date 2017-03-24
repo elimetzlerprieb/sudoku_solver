@@ -1,3 +1,5 @@
+var dim = 9; // size of sudoku puzzle 
+
 //puzzle = buildPuzzle()
 
 // From dailysudoku.com/sudoku/play.shtml on March 17, 2017
@@ -14,8 +16,8 @@
 console.log(unsolvedPuzzle.join("\n"));
 */
 $(document).ready(function(){
-	showGrid('puzzle')
-	showGrid('solution')
+	showGrid("puzzle")
+	showGrid("solution")
 
 	clickToGetPuzzle()
 	clickToSolve()
@@ -36,17 +38,17 @@ function copyPuzzle(puzzle) {
 
 // Creates HTML array
 function showGrid(name) {
-	// Append rows to table
-	for(var x = 0; x < 9; x++) {
+	// Append rows to table with "name". id corresponds to row index
+	for(var x = 0; x < dim; x++) {
 		jQuery("<tr/>", {
-			id: 'r'+x+name,
+			id: "r"+x+name,
 		}).appendTo("[id="+name+"]");
 
-		// Append td to each row
-		for(var y = 0; y < 9; y++) {
+		// Append td to each row. id corresponds to coumn index
+		for(var y = 0; y < dim; y++) {
 			jQuery("<td/>", {
 			class: "box",
-			id: 'c' + y + name,
+			id: "c" + y + name,
 			}).appendTo("tr[id=r"+x+name+"]");
 		}
 	}
@@ -64,20 +66,20 @@ function updateGrid(name,puzzle) {
 // Reads HTML grid and generates an array
 function readGrid(name) {
 	var puzzle = [];
-	for(var x = 0; x < 9; x++) {
+	for(var x = 0; x < dim; x++) {
 		puzzle[x] = [];
-		for(var y = 0; y < 9; y++) {
+		for(var y = 0; y < dim; y++) {
 			puzzle[x][y] = $("tr[id=r"+x+name+"] > td[id=c"+y+name+"]").text();
 		}
 	}
-	console.log(puzzle)
 	return puzzle
 };
 
 
-// Loads puzzle 
+// Retrieves puzzles and fills in HTML grids with values
 function clickToGetPuzzle() {
 	$(document).on("click","#random",function(){
+		/*
 		testPuzzle = [[4,0,8,0,0,0,0,6,7],
 				  [0,2,0,0,0,8,0,0,0],
 				  [0,0,0,7,5,0,0,0,0],
@@ -87,26 +89,110 @@ function clickToGetPuzzle() {
 				  [0,0,0,0,1,9,0,0,0],
 				  [0,0,0,8,0,0,0,9,0],
 				  [5,6,0,0,0,0,1,0,3]];
-		updateGrid('puzzle',testPuzzle)
-		updateGrid('solution',testPuzzle)
+		*/
+		var testPuzzle = convertSeed(getSeed(0));
 		console.log(testPuzzle.join("\n"))
+		updateGrid("puzzle",testPuzzle)
+		updateGrid("solution",testPuzzle)
 	})
 };
 
-// On click: parses current HTML puzzle into an array and solves array before updating solution grid 
+// Set of seed puzzles of differernt difficulties
+function getSeed(n=0) {
+	if(n==0){n=Math.floor((Math.random()*5)+1)}
+	var seeds = [];
+	
+	// easy
+	seeds[1] = [["i","a","d","h","0","0","b","0","0"],
+	["e","0","0","0","0","0","0","i","0"],
+	["0","c","g","0","e","b","0","0","0"],
+	["0","0","0","b","0","0","c","0","h"],
+	["a","f","h","0","g","0","e","b","i"],
+	["g","0","c","0","0","h","0","0","0"],
+	["0","0","0","a","c","0","i","h","0"],
+	["0","i","0","0","0","0","0","0","b"],
+	["0","0","e","0","0","i","a","d","c"]]
+
+	// medium
+	seeds[2] = [["0","h","0","0","0","d","0","a","e"],
+	["0","0","c","0","0","i","g","0","h"],
+	["0","0","0","0","e","0","0","d","0"],
+	["0","0","i","g","0","f","0","0","b"],
+	["0","0","0","0","b","0","0","0","0"],
+	["h","0","0","a","0","e","c","0","0"],
+	["0","i","0","0","d","0","0","0","0"],
+	["c","0","h","i","0","0","d","0","0"],
+	["f","g","0","h","0","0","0","i","0"]]
+
+	// hard
+	seeds[3] = [["0","0","g","d","0","b","0","0","e"],
+	["0","0","0","0","0","0","b","0","0"],
+	["0","0","d","i","0","f","a","0","0"],
+	["0","0","c","0","0","g","0","0","i"],
+	["0","a","h","0","0","0","e","g","0"],
+	["g","0","0","h","0","0","c","0","0"],
+	["0","0","b","f","0","a","d","0","0"],
+	["0","0","i","0","0","0","0","0","0"],
+	["d","0","0","e","0","i","h","0","0"]]
+
+	// evil 
+	seeds[4] = [["g","0","0","0","0","0","0","0","h"],
+	["0","0","e","h","0","g","f","0","0"],
+	["0","h","0","0","i","0","0","a","0"],
+	["0","a","0","0","h","0","0","i","0"],
+	["0","0","g","c","0","b","d","0","0"],
+	["0","d","0","0","f","0","0","b","0"],
+	["0","g","0","0","a","0","0","e","0"],
+	["0","0","f","b","0","i","a","0","0"],
+	["b","0","0","0","0","0","0","0","d"]]
+
+	// extreme evil
+	seeds[5] = [["0","0","i","0","0","e","0","0","b"],
+	["0","a","0","0","i","0","0","f","0"],
+	["b","0","0","h","0","0","d","0","0"],
+	["i","0","0","d","0","0","c","0","0"],
+	["0","c","0","0","b","0","0","h","0"],
+	["0","0","b","0","0","c","0","0","e"],
+	["0","0","f","0","0","b","0","0","c"],
+	["0","e","0","0","a","0","0","g","0"],
+	["a","0","0","f","0","0","h","0","0"]]
+	console.log(n)
+	return seeds[n]
+};
+
+// Changes seed into an array
+function convertSeed(seed) {
+	var k = Math.floor(Math.random()*10)
+	for(var x = 0; x < (seed.length); x++) {
+		for(var y = 0; y < (seed.length); y++) {
+			if(seed[x][y] == "a"){seed[x][y] = ((0+k)%9)+1}
+			else if(seed[x][y] =="b"){seed[x][y] = ((1+k)%9)+1}
+			else if(seed[x][y] =="c"){seed[x][y] = ((2+k)%9)+1}
+			else if(seed[x][y] =="d"){seed[x][y] = ((3+k)%9)+1}
+			else if(seed[x][y] =="e"){seed[x][y] = ((4+k)%9)+1}
+			else if(seed[x][y] =="f"){seed[x][y] = ((5+k)%9)+1}
+			else if(seed[x][y] =="g"){seed[x][y] = ((6+k)%9)+1}
+			else if(seed[x][y] =="h"){seed[x][y] = ((7+k)%9)+1}
+			else if(seed[x][y] =="i"){seed[x][y] = ((8+k)%9)+1}  
+		}
+	}
+	return seed
+};
+
+// On click: reads current HTML puzzle into an array and solves array before updating solution grid 
 function clickToSolve() {
 	$(document).on("click","#solve",function(){
-		puzzle = readGrid('puzzle')
+		puzzle = readGrid("puzzle")
 		var solvedPuzzle = solvePuzzle(puzzle)
-		updateGrid('solution',solvedPuzzle)
+		updateGrid("solution",solvedPuzzle)
 	})
 };
 
-// On click: parses current HTML puzzle into an array and makes solution grid identical 
+// On click: read current HTML puzzle into an array and makes solution grid identical 
 function clickToReset() {
 	$(document).on("click","#reset",function(){
-		puzzle = readGrid('puzzle')
-		updateGrid('solution',puzzle);
+		puzzle = readGrid("puzzle")
+		updateGrid("solution",puzzle);
 	})
 };
 
@@ -115,7 +201,7 @@ function solvePuzzle(puzzle,x=0,y=0) {
 	// Check to see if the puzzle has been filled in
 	var coord = findEmpty(puzzle);
 
-	// Non-base case: puzzle is not solved (not filled)
+	// Non-base case (puzzle is not filled in); attempt to fill in value, if succesive, calle recursive function
 	if(coord != false){
 		x = coord[0];
 		y = coord[1];
@@ -128,7 +214,7 @@ function solvePuzzle(puzzle,x=0,y=0) {
 		}
 		return false 
 	} 
-	// Base case: puzzle is solved (filled with correct values)
+	// Base case: puzzle is solved (filled with correct values), return puzzle 
 	else if(coord == false){
 		console.log("Solved!")
 		return puzzle
@@ -136,7 +222,7 @@ function solvePuzzle(puzzle,x=0,y=0) {
 };
  
 
-// Looks for an empty cell. Returns false if array is full 
+// Looks for an empty cell. Returns coordinates of empty cell or false if array is full
 function findEmpty(puzzle){
 	for(var x = 0; x < (puzzle.length); x++) {
 		for(var y = 0; y < (puzzle.length); y++) {
@@ -150,7 +236,7 @@ function findEmpty(puzzle){
 
 // Checks to make sure integer is not already in row
 function checkRow(puzzle,x,y,i){
-	for(var j = 0; j < 9; j++){
+	for(var j = 0; j < dim; j++){
 		if(puzzle[x][j] == i){return false}
 	}
 	return true
@@ -158,7 +244,7 @@ function checkRow(puzzle,x,y,i){
 
 // Checks to make sure integer is not already in column
 function checkColumn(puzzle,x,y,i){
-	for(var k = 0; k < 9; k++){
+	for(var k = 0; k < dim; k++){
 		if(puzzle[k][y] == i){return false}
 	}
 	return true
