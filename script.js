@@ -1,30 +1,16 @@
-var dim = 9; // size of sudoku puzzle 
+var dim = 9; // size of sudoku puzzle
 
-//puzzle = buildPuzzle()
 
-// From dailysudoku.com/sudoku/play.shtml on March 17, 2017
-/*puzzle = [[4,0,8,0,0,0,0,6,7],
-		  [0,2,0,0,0,8,0,0,0],
-		  [0,0,0,7,5,0,0,0,0],
-		  [8,0,5,0,7,4,0,2,0],
-		  [2,0,0,0,0,0,0,0,5],
-		  [0,4,0,5,6,0,3,0,8],
-		  [0,0,0,0,1,9,0,0,0],
-		  [0,0,0,8,0,0,0,9,0],
-		  [5,6,0,0,0,0,1,0,3]];
-
-console.log(unsolvedPuzzle.join("\n"));
-*/
 $(document).ready(function(){
 	showGrid("puzzle")
 	showGrid("solution")
 
-	clickToGetPuzzle()
+	clickToGetRandom()
+	clickToGetBlank()
+	clickToGetUserPuzzle()
 	clickToSolve()
 	clickToReset()
 })
-
-
 
 /*
 function copyPuzzle(puzzle) {
@@ -34,7 +20,6 @@ function copyPuzzle(puzzle) {
 	return newPuzzle
 }
 */
-
 
 // Creates HTML array
 function showGrid(name) {
@@ -47,7 +32,7 @@ function showGrid(name) {
 		// Append td to each row. id corresponds to coumn index
 		for(var y = 0; y < dim; y++) {
 			jQuery("<td/>", {
-			class: "box",
+			class: name + "box",
 			id: "c" + y + name,
 			}).appendTo("tr[id=r"+x+name+"]");
 		}
@@ -77,23 +62,50 @@ function readGrid(name) {
 
 
 // Retrieves puzzles and fills in HTML grids with values
-function clickToGetPuzzle() {
+function clickToGetRandom() {
 	$(document).on("click","#random",function(){
-		/*
-		testPuzzle = [[4,0,8,0,0,0,0,6,7],
-				  [0,2,0,0,0,8,0,0,0],
-				  [0,0,0,7,5,0,0,0,0],
-				  [8,0,5,0,7,4,0,2,0],
-				  [2,0,0,0,0,0,0,0,5],
-				  [0,4,0,5,6,0,3,0,8],
-				  [0,0,0,0,1,9,0,0,0],
-				  [0,0,0,8,0,0,0,9,0],
-				  [5,6,0,0,0,0,1,0,3]];
-		*/
 		var testPuzzle = convertSeed(getSeed(0));
 		console.log(testPuzzle.join("\n"))
 		updateGrid("puzzle",testPuzzle)
 		updateGrid("solution",testPuzzle)
+	})
+};
+
+function clickToGetBlank() {
+	$(document).on("click","#blank",function(){
+		var blank = [[0,0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0,0]];
+		console.log(blank.join("\n"))
+		updateGrid("puzzle",blank)
+		updateGrid("solution",blank)
+	})
+};
+
+function clickToGetUserPuzzle() {
+	$(document).on("click","#input",function() {
+		var input = prompt('Please input your puzzle. 0 for blanks. Commas at end of lines');
+		console.log(input)
+		var puzzle = input.split(',')
+		for(i=0; i<puzzle.length; i++) {
+			puzzle[i] = puzzle[i].split('');
+		}
+
+		for(var x = 0; x < puzzle.length; x++) {
+			for(var y = 0; y < puzzle.length; y++) {
+				puzzle[x][y] = parseInt(puzzle[x][y])
+			}
+		}
+		console.log(puzzle.join("\n"))
+		console.log('Yeah!')
+		updateGrid("puzzle",puzzle)
+		updateGrid("solution",puzzle)
 	})
 };
 
@@ -160,7 +172,7 @@ function getSeed(n=0) {
 	return seeds[n]
 };
 
-// Changes seed into an array
+// Changes seed into an array, rotates integer values 
 function convertSeed(seed) {
 	var k = Math.floor(Math.random()*10)
 	for(var x = 0; x < (seed.length); x++) {
@@ -220,7 +232,6 @@ function solvePuzzle(puzzle,x=0,y=0) {
 		return puzzle
 	}
 };
- 
 
 // Looks for an empty cell. Returns coordinates of empty cell or false if array is full
 function findEmpty(puzzle){

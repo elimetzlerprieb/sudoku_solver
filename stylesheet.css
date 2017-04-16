@@ -11,6 +11,14 @@ html, body {
 
 }
 
+#blank {
+
+}
+
+#input {
+
+}
+
 #solve {
 
 }
@@ -21,14 +29,6 @@ html, body {
 
 #reset {
 
-}
-
-.s {
-
-}
-
-.p {
-	
 }
 
 #puzzle {
@@ -47,7 +47,17 @@ html, body {
 	margin-bottom: 20px;
 }
 
-.box {
+.puzzlebox {
+	border-radius: 5px;
+	text-align: center;
+	height: 40px;
+	width: 40px;
+	margin: 0;
+	padding: 0;
+	border: solid black 1px;
+}
+
+.solutionbox {
 	border-radius: 5px;
 	text-align: center;
 	height: 20px;
